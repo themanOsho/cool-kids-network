@@ -275,7 +275,7 @@ class CoolKidsNetwork {
                 wp_set_current_user($user->ID);
                 wp_set_auth_cookie($user->ID);
 
-                // Redirect to /profile page after successful login
+                // Redirect to /profile page after successful login.
                 wp_safe_redirect(home_url('/profile'));
                 exit;
             } else {
