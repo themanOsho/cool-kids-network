@@ -351,7 +351,10 @@ class CoolKidsNetwork {
 			$output .= "<tr><td>{$first_name} {$last_name}</td><td>{$country}</td>";
 
 			if ( in_array( 'coolest_kid', $current_user->roles, true ) ) {
-				$output .= '<td>' . esc_html( $user->user_email ) . '</td><td>' . esc_html( ucfirst( $user->roles[0] ) ) . '</td>';
+				// Format role name: Replace underscores with spaces & capitalize each word
+				$formatted_role = ucwords( str_replace( '_', ' ', $user->roles[0] ) );
+
+				$output .= '<td>' . esc_html( $user->user_email ) . '</td><td>' . esc_html( $formatted_role ) . '</td>';
 			}
 
 			$output .= '</tr>';
