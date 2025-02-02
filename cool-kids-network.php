@@ -1,5 +1,5 @@
 <?php
-/*
+/* 
 Plugin Name: Cool Kids Network
 Description: A WordPress plugin for managing user roles in the Cool Kids Network.
 Version: 1.0
