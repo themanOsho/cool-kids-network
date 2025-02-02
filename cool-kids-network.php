@@ -249,42 +249,42 @@ class CoolKidsNetwork {
 	}
 
 	/**
-     * Login form shortcode
-     */
-    public function login_form() {
-        ob_start();
-        ?>
-        <form id="cool-kids-login" method="post">
-            <?php wp_nonce_field('cool_kids_login', 'cool_kids_nonce'); ?>
-            <label for="email">Email Address:</label>
-            <input type="email" id="email" name="email" required>
-            <button type="submit">Login</button>
-        </form>
-        <?php
+	 * Login form shortcode
+	 */
+	public function login_form() {
+		ob_start();
+		?>
+		<form id="cool-kids-login" method="post">
+			<?php wp_nonce_field( 'cool_kids_login', 'cool_kids_nonce' ); ?>
+			<label for="email">Email Address:</label>
+			<input type="email" id="email" name="email" required>
+			<button type="submit">Login</button>
+		</form>
+		<?php
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
-            // Verify nonce for security
-            if (!isset($_POST['cool_kids_nonce']) || !wp_verify_nonce($_POST['cool_kids_nonce'], 'cool_kids_login')) {
-                wp_die('Security check failed!');
-            }
+		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['email'] ) ) {
+			// Verify nonce for security
+			if ( ! isset( $_POST['cool_kids_nonce'] ) || ! wp_verify_nonce( $_POST['cool_kids_nonce'], 'cool_kids_login' ) ) {
+				wp_die( 'Security check failed!' );
+			}
 
-            $email = sanitize_email(wp_unslash($_POST['email'])); // Unsanitize input for security
-            $user  = get_user_by('email', $email);
+			$email = sanitize_email( wp_unslash( $_POST['email'] ) ); // Unsanitize input for security
+			$user  = get_user_by( 'email', $email );
 
-            if ($user) {
-                wp_set_current_user($user->ID);
-                wp_set_auth_cookie($user->ID);
+			if ( $user ) {
+				wp_set_current_user( $user->ID );
+				wp_set_auth_cookie( $user->ID );
 
-                // Redirect to /profile page after successful login.
-                wp_safe_redirect(home_url('/profile'));
-                exit;
-            } else {
-                echo '<p>No account found with that email!</p>';
-            }
-        }
+				// Redirect to /profile page after successful login.
+				wp_safe_redirect( home_url( '/profile' ) );
+				exit;
+			} else {
+				echo '<p>No account found with that email!</p>';
+			}
+		}
 
-        return ob_get_clean();
-    }
+		return ob_get_clean();
+	}
 
 	/**
 	 * Display character data
