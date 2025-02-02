@@ -7,12 +7,12 @@ Author: Joshua Osho
 */
 
 // Exit if accessed directly.
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 // Load the main class file.
-require_once plugin_dir_path(__FILE__) . 'class-coolkidsnetwork.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-coolkidsnetwork.php';
 
 // Initialize the plugin.
 new CoolKidsNetwork();
