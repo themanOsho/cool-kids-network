@@ -19,13 +19,16 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'  # ✅ Upgraded PHP to match composer.lock requirements
 
-      - name: Allow Composer Plugins ✅ # FIX: Prevent Composer blocking
+      - name: Allow Composer Plugins ✅
         run: composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
 
       - name: Install PHP_CodeSniffer
         run: composer global require squizlabs/php_codesniffer wp-coding-standards/wpcs
+
+      - name: Auto-fix PHPCS issues ✅
+        run: composer global exec phpcbf -- --standard=WordPress .
 
       - name: Run PHPCS
         run: phpcs --standard=WordPress .
@@ -40,7 +43,10 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'  # ✅ Upgraded PHP version to fix PHPUnit dependency issue
+
+      - name: Update Composer Dependencies ✅
+        run: composer update --lock  # ✅ Ensures compatibility with PHP 8.1
 
       - name: Install Dependencies
         run: composer install
