@@ -28,7 +28,7 @@ jobs:
         run: composer global require squizlabs/php_codesniffer wp-coding-standards/wpcs
 
       - name: Auto-fix PHPCS issues ✅
-        run: composer global exec phpcbf -- --standard=WordPress --ignore=vendor .
+        run: composer global exec phpcbf -- --standard=WordPress --ignore=vendor . || true
 
       - name: Run PHPCS
         run: phpcs --standard=WordPress --ignore=vendor .
@@ -46,7 +46,7 @@ jobs:
           php-version: '8.1'
 
       - name: Verify PHP Version ✅
-        run: php -v  # ✅ Print PHP version to logs
+        run: php -v
 
       - name: Update Composer Dependencies ✅
         run: composer update --no-dev --prefer-dist --no-interaction
@@ -55,7 +55,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Fix PHPUnit Permissions ✅
-        run: chmod +x vendor/bin/phpunit  # ✅ Allow execution of PHPUnit
+        run: chmod +x vendor/bin/phpunit
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit
