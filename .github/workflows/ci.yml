@@ -30,8 +30,9 @@ jobs:
       - name: Auto-fix PHPCS issues ✅
         run: composer global exec phpcbf -- --standard=WordPress --ignore=vendor . || true
 
-      - name: Run PHPCS
-        run: phpcs --standard=WordPress --ignore=vendor .
+      - name: Run PHPCS (Check for Remaining Issues) ❌
+        run: phpcs --standard=WordPress --ignore=vendor . || exit 1
+
 
   test:
     name: Run Tests
