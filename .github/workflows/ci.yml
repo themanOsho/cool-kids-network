@@ -19,7 +19,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'  # ✅ Ensuring correct PHP version
+          php-version: '8.1'
 
       - name: Allow Composer Plugins ✅
         run: composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
@@ -28,11 +28,11 @@ jobs:
         run: composer global require squizlabs/php_codesniffer wp-coding-standards/wpcs
 
       - name: Auto-fix PHPCS issues ✅
-        run: composer global exec phpcbf -- --standard=WordPress --ignore=vendor .
+        run: composer global exec phpcbf -- --standard=WordPress --ignore=vendor . || true
 
-      - name: Run PHPCS
-        run: phpcs --standard=WordPress .
-
+      - name: Run PHPCS (Strict Mode ❌)
+        run: composer global exec phpcs --standard=WordPress --ignore=vendor .
+  
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -43,16 +43,19 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'  # ✅ Ensuring correct PHP version
+          php-version: '8.1'
 
       - name: Verify PHP Version ✅
-        run: php -v  # ✅ Prints PHP version to verify in logs
+        run: php -v
 
       - name: Update Composer Dependencies ✅
-        run: composer update --no-dev --prefer-dist --no-interaction  # ✅ Ensures correct versions
+        run: composer update --no-dev --prefer-dist --no-interaction
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Fix PHPUnit Permissions ✅
+        run: chmod +x vendor/bin/phpunit
+
       - name: Run PHPUnit
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --testdox --bootstrap=vendor/autoload.php tests/
