@@ -52,4 +52,4 @@ jobs:
         run: chmod +x vendor/bin/phpunit
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit --testdox
+        run: vendor/bin/phpunit --testdox --bootstrap=vendor/autoload.php tests/

@@ -7,6 +7,8 @@
  * @package CoolKidsNetwork
  */
 
+namespace CoolKidsNetwork;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
