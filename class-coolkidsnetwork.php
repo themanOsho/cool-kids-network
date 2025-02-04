@@ -86,33 +86,45 @@ class CoolKidsNetwork {
 			return new WP_Error( 'invalid_role', 'Invalid role specified.', array( 'status' => 400 ) );
 		}
 
-		// First, try to get the user by email (faster than meta query).
+		// ✅ First, try to get the user by email (faster than meta query).
 		$user = get_user_by( 'email', $email );
 
-		// If no user found by email, search by first and last name.
+		// ✅ If no user found by email, search by first and last name.
 		if ( ! $user && $first_name && $last_name ) {
-			// Search users using get_users() instead of direct DB query.
-			$users = get_users(
-				array(
-					'meta_query' => array(
-						'relation' => 'AND',
-						array(
-							'key'     => 'first_name',
-							'value'   => $first_name,
-							'compare' => '=',
-						),
-						array(
-							'key'     => 'last_name',
-							'value'   => $last_name,
-							'compare' => '=',
-						),
-					),
-					'number'     => 1, // Limit to 1 result to optimize performance.
-				)
-			);
+			$cache_key = 'user_' . md5( strtolower( $first_name . '_' . $last_name ) );
+			$user_id   = wp_cache_get( $cache_key );
 
-			if ( ! empty( $users ) ) {
-				$user = $users[0]; // Get the first matched user.
+			if ( false === $user_id ) {
+				$query = new WP_User_Query(
+					array(
+						'meta_query' => array(
+							'relation' => 'AND',
+							array(
+								'key'     => 'first_name',
+								'value'   => $first_name,
+								'compare' => '=',
+							),
+							array(
+								'key'     => 'last_name',
+								'value'   => $last_name,
+								'compare' => '=',
+							),
+						),
+						'fields'     => 'ID', // ✅ Only fetch the ID to reduce memory usage
+						'number'     => 1, // ✅ Limit to 1 result
+					)
+				);
+
+				$users = $query->get_results();
+
+				if ( ! empty( $users ) ) {
+					$user_id = $users[0];
+					wp_cache_set( $cache_key, $user_id, 'users', 3600 ); // ✅ Cache result for 1 hour
+				}
+			}
+
+			if ( $user_id ) {
+				$user = get_user_by( 'ID', $user_id );
 			}
 		}
 
