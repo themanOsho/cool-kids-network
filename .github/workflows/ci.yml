@@ -21,18 +21,15 @@ jobs:
         with:
           php-version: '8.1'
 
-      - name: Allow Composer Plugins ✅
-        run: composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-
-      - name: Install PHP_CodeSniffer
-        run: composer global require squizlabs/php_codesniffer wp-coding-standards/wpcs
-
-      - name: Auto-fix PHPCS issues ✅
-        run: composer global exec phpcbf -- --standard=WordPress --ignore=vendor . || true
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
 
       - name: Run PHPCS (Strict Mode ❌)
-        run: composer global exec phpcs --standard=WordPress --ignore=vendor .
-  
+        run: vendor/bin/phpcs --standard=WordPress --ignore=vendor .
+
+      - name: Auto-fix PHPCS issues ✅
+        run: vendor/bin/phpcbf --standard=WordPress --ignore=vendor . || true
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -48,9 +45,6 @@ jobs:
       - name: Verify PHP Version ✅
         run: php -v
 
-      - name: Update Composer Dependencies ✅
-        run: composer update --no-dev --prefer-dist --no-interaction
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
@@ -58,4 +52,4 @@ jobs:
         run: chmod +x vendor/bin/phpunit
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit --testdox --bootstrap=vendor/autoload.php tests/
+        run: vendor/bin/phpunit --testdox
