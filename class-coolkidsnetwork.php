@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class CoolKidsNetwork
  */
 class CoolKidsNetwork {
+	/**
+	 * Constructor to initialize plugin.
+	 */
 	public function __construct() {
 		/** Hooks and actions */
 		add_action( 'init', array( $this, 'register_roles' ) );
@@ -27,7 +30,7 @@ class CoolKidsNetwork {
 	}
 
 	/**
-	 * Register custom roles
+	 * Register custom user roles.
 	 */
 	public function register_roles() {
 		add_role( 'cool_kid', 'Cool Kid', array( 'read' => true ) );
@@ -51,7 +54,7 @@ class CoolKidsNetwork {
 	}
 
 	/**
-	 * Register REST API routes
+	 * Register REST API routes.
 	 */
 	public function register_api_routes() {
 		register_rest_route(
@@ -68,7 +71,10 @@ class CoolKidsNetwork {
 	}
 
 	/**
-	 * Handle role updates via REST API
+	 * Handle role updates via REST API.
+	 *
+	 * @param WP_REST_Request $request REST API request object.
+	 * @return WP_REST_Response|WP_Error API response or error message.
 	 */
 	public function update_user_role( WP_REST_Request $request ) {
 		$email      = sanitize_email( $request->get_param( 'email' ) );
@@ -80,8 +86,12 @@ class CoolKidsNetwork {
 			return new WP_Error( 'invalid_role', 'Invalid role specified.', array( 'status' => 400 ) );
 		}
 
+		// First, try to get the user by email (faster than meta query).
 		$user = get_user_by( 'email', $email );
+
+		// If no user found by email, search by first and last name.
 		if ( ! $user && $first_name && $last_name ) {
+			// Search users using get_users() instead of direct DB query.
 			$users = get_users(
 				array(
 					'meta_query' => array(
@@ -97,9 +107,13 @@ class CoolKidsNetwork {
 							'compare' => '=',
 						),
 					),
+					'number'     => 1, // Limit to 1 result to optimize performance.
 				)
 			);
-			$user  = ! empty( $users ) ? $users[0] : null;
+
+			if ( ! empty( $users ) ) {
+				$user = $users[0]; // Get the first matched user.
+			}
 		}
 
 		if ( ! $user ) {
@@ -112,6 +126,7 @@ class CoolKidsNetwork {
 				'role' => $new_role,
 			)
 		);
+
 		return rest_ensure_response( array( 'message' => 'User role updated successfully.' ) );
 	}
 
@@ -131,10 +146,10 @@ class CoolKidsNetwork {
 	}
 
 	/**
-	 * Render the admin page
+	 * Render the admin page for role assignment.
 	 */
 	public function render_admin_page() {
-		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['cool_kids_assign_role'] ) ) {
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['cool_kids_assign_role'] ) ) {
 			check_admin_referer( 'cool_kids_form' ); /** Verify nonce */
 			$this->assign_role();
 		}
@@ -182,26 +197,39 @@ class CoolKidsNetwork {
 	 * Handle role assignment from the admin page
 	 */
 	private function assign_role() {
-		$user_id     = intval( $_POST['user_id'] );
-		$new_role    = sanitize_text_field( $_POST['new_role'] );
-		$valid_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
+		// Check if all required fields are set.
+		if ( isset( $_POST['user_id'], $_POST['new_role'], $_POST['cool_kids_nonce'] ) ) {
+			// Unsanitize before verification.
+			$nonce = sanitize_text_field( wp_unslash( $_POST['cool_kids_nonce'] ) );
 
-		if ( ! $user_id || ! in_array( $new_role, $valid_roles, true ) ) {
-			echo "<div class='error notice'><p>Invalid user or role.</p></div>";
-			return;
-		}
+			// Verify Nonce (security check).
+			if ( ! wp_verify_nonce( $nonce, 'cool_kids_assign_role' ) ) {
+				echo "<div class='error notice'><p>Security check failed! Nonce verification failed.</p></div>";
+				return;
+			}
 
-		$user = get_user_by( 'ID', $user_id );
-		if ( $user ) {
-			wp_update_user(
-				array(
-					'ID'   => $user_id,
-					'role' => $new_role,
-				)
-			);
-			echo "<div class='updated notice'><p>Role updated successfully for " . esc_html( $user->display_name ) . '.</p></div>';
-		} else {
-			echo "<div class='error notice'><p>User not found.</p></div>";
+			$user_id  = intval( $_POST['user_id'] );
+			$new_role = sanitize_text_field( wp_unslash( $_POST['new_role'] ) );
+
+			$valid_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
+
+			if ( ! $user_id || ! in_array( $new_role, $valid_roles, true ) ) {
+				echo "<div class='error notice'><p>Invalid user or role.</p></div>";
+				return;
+			}
+
+			$user = get_user_by( 'ID', $user_id );
+			if ( $user ) {
+				wp_update_user(
+					array(
+						'ID'   => $user_id,
+						'role' => $new_role,
+					)
+				);
+				echo "<div class='updated notice'><p>Role updated successfully for " . esc_html( $user->display_name ) . '.</p></div>';
+			} else {
+				echo "<div class='error notice'><p>User not found.</p></div>";
+			}
 		}
 	}
 
@@ -219,13 +247,16 @@ class CoolKidsNetwork {
 		</form>
 		<?php
 
-		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['email'] ) ) {
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['email'], $_POST['cool_kids_nonce'] ) ) {
+			// Unsanitize before verification.
+			$nonce = sanitize_text_field( wp_unslash( $_POST['cool_kids_nonce'] ) );
+
 			/** Verify nonce for security */
-			if ( ! isset( $_POST['cool_kids_nonce'] ) || ! wp_verify_nonce( $_POST['cool_kids_nonce'], 'cool_kids_register' ) ) {
-				wp_die( 'Security check failed ! ' );
+			if ( ! wp_verify_nonce( $nonce, 'cool_kids_register' ) ) {
+				wp_die( esc_html__( 'Security check failed!', 'cool-kids' ) );
 			}
 
-			$email = sanitize_email( wp_unslash( $_POST['email'] ) ); /** Unsanitize for security */
+			$email = sanitize_email( wp_unslash( $_POST['email'] ) );
 
 			if ( ! email_exists( $email ) ) {
 				$random_data = CharacterManager::generate_random_user();
@@ -242,18 +273,17 @@ class CoolKidsNetwork {
 						update_user_meta( $user_id, 'first_name', $random_data['first_name'] );
 						update_user_meta( $user_id, 'last_name', $random_data['last_name'] );
 						update_user_meta( $user_id, 'country', $random_data['country'] );
-						echo '<p>' . esc_html__( 'Registration successful !  Welcome, Cool Kid ! ', 'cool-kids' ) . '</p>';
+						echo '<p>' . esc_html__( 'Registration successful! Welcome, Cool Kid!', 'cool-kids' ) . '</p>';
 					} else {
-						echo '<p>' . esc_html__( 'Error creating user: ', 'cool-kids' ) . esc_html( $user_id->get_error_message() ) . '</p>';
+						echo '<p>' . esc_html__( 'Error creating user:', 'cool-kids' ) . esc_html( $user_id->get_error_message() ) . '</p>';
 					}
 				}
 			} else {
-				echo '<p>' . esc_html__( 'Email is already registered ! ', 'cool-kids' ) . '</p>';
+				echo '<p>' . esc_html__( 'Email is already registered!', 'cool-kids' ) . '</p>';
 			}
 		}
 		return ob_get_clean();
 	}
-
 
 	/**
 	 * Login form shortcode
@@ -269,9 +299,12 @@ class CoolKidsNetwork {
 		</form>
 		<?php
 
-		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['email'] ) ) {
-			if ( ! isset( $_POST['cool_kids_nonce'] ) || ! wp_verify_nonce( $_POST['cool_kids_nonce'], 'cool_kids_login' ) ) {
-				wp_die( 'Security check failed ! ' );
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['email'], $_POST['cool_kids_nonce'] ) ) {
+			// Unsanitize before verification.
+			$nonce = sanitize_text_field( wp_unslash( $_POST['cool_kids_nonce'] ) );
+
+			if ( ! wp_verify_nonce( $nonce, 'cool_kids_login' ) ) {
+				wp_die( esc_html__( 'Security check failed!', 'cool-kids' ) );
 			}
 
 			$email = sanitize_email( wp_unslash( $_POST['email'] ) );
@@ -283,7 +316,7 @@ class CoolKidsNetwork {
 				wp_safe_redirect( home_url( '/profile' ) );
 				exit;
 			} else {
-				echo '<p>' . esc_html__( 'No account found with that email ! ', 'cool-kids' ) . '</p>';
+				echo '<p>' . esc_html__( 'No account found with that email!', 'cool-kids' ) . '</p>';
 			}
 		}
 
@@ -351,7 +384,7 @@ class CoolKidsNetwork {
 			$output .= "<tr><td>{$first_name} {$last_name}</td><td>{$country}</td>";
 
 			if ( in_array( 'coolest_kid', $current_user->roles, true ) ) {
-				// Format role name: Replace underscores with spaces & capitalize each word
+				// Format role name: Replace underscores with spaces & capitalize each word.
 				$formatted_role = ucwords( str_replace( '_', ' ', $user->roles[0] ) );
 
 				$output .= '<td>' . esc_html( $user->user_email ) . '</td><td>' . esc_html( $formatted_role ) . '</td>';
@@ -366,24 +399,5 @@ class CoolKidsNetwork {
 	}
 }
 
-class CharacterManager {
-	public static function generate_random_user() {
-		$response = wp_remote_get( 'https://randomuser.me/api/' );
-		if ( is_wp_error( $response ) ) {
-			error_log( 'Error fetching random user: ' . $response->get_error_message() );
-			return null;
-		}
-
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( $data && isset( $data['results'][0] ) ) {
-			$user = $data['results'][0];
-			return array(
-				'first_name' => ucfirst( $user['name']['first'] ),
-				'last_name'  => ucfirst( $user['name']['last'] ),
-				'country'    => $user['location']['country'],
-			);
-		}
-
-		return null;
-	}
-}
+// Initialize the plugin.
+new CoolKidsNetwork();
