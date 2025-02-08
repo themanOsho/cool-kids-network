@@ -412,6 +412,3 @@ class CoolKidsNetwork {
 		return $output;
 	}
 }
-
-// Initialize the plugin.
-new CoolKidsNetwork();
