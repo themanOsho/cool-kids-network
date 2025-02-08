@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load Composer Autoloader
-require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
+// Load Composer Autoloader.
+require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
 // Use the namespace.
 use CoolKidsNetwork\coolkidsnetwork;
