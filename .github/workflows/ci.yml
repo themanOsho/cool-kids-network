@@ -42,19 +42,15 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:5.7  # ✅ Use MySQL 5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wordpress_test
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root  # ✅ Correctly set root password
+          MYSQL_DATABASE: wordpress_test  # ✅ Database for WordPress tests
+          MYSQL_USER: wordpress  # ✅ Create a non-root MySQL user
+          MYSQL_PASSWORD: wordpress  # ✅ Set password for the user
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
       - name: Checkout code
@@ -74,13 +70,10 @@ jobs:
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
 
-      - name: Wait for MySQL to be ready
-        run: sleep 15
-
       - name: Start WordPress
         run: |
           wp core download --allow-root
-          wp config create --dbname=wordpress_test --dbuser=root --dbpass=root --dbhost=127.0.0.1 --allow-root
+          wp config create --dbname=wordpress_test --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --allow-root
           wp db create --allow-root
           wp core install --url=localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=test@example.com --allow-root
 
