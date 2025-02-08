@@ -1,7 +1,7 @@
 <?php
 /**
  * PHPUnit Tests for Cool Kids Network Plugin.
- * 
+ *
  * @package CoolKidsNetwork
  */
 
@@ -9,12 +9,14 @@ namespace CoolKidsNetwork\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-// ✅ Dynamically find wp-load.php.
-if ( file_exists( dirname( __DIR__, 4 ) . '/wp-load.php' ) ) {
-    require_once dirname( __DIR__, 4 ) . '/wp-load.php'; // ✅ Adjust as needed
+// ✅ Dynamically find wp-load.php for local & CI/CD environments.
+$wp_load_path = '/home/runner/work/cool-kids-network/cool-kids-network/wp-load.php';
+
+if ( file_exists( $wp_load_path ) ) {
+    require_once $wp_load_path;
 } else {
-    fwrite(STDERR, "Skipping test: wp-load.php not found\n"); // ✅ Debug message
-    return;
+    fwrite(STDERR, "ERROR: wp-load.php not found! Tests cannot run.\n");
+    exit(1);
 }
 
 /**
