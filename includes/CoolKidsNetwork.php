@@ -3,7 +3,6 @@
  * Cool Kids Network - Main Plugin Class
  *
  * Handles user roles, admin pages, and API endpoints.
- * 
  *
  * @package CoolKidsNetwork
  */
