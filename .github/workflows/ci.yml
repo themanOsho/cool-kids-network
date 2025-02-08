@@ -22,6 +22,9 @@ jobs:
           php-version: '8.1'
           tools: php-cs-fixer, phpcs, phpcbf
 
+      - name: Allow Composer Plugins ✅  # Fix: Prevent Composer blocking
+        run: composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+            
       - name: Install WordPress Coding Standards (WPCS)
         run: |
           composer global require "wp-coding-standards/wpcs"
@@ -80,7 +83,7 @@ jobs:
           echo "WordPress Installed"
 
       - name: Verify WordPress is Installed
-        run: wp core is-installed --allow-root || exit 1  # ✅ Debugging step
+        run: wp core is-installed --allow-root || exit 1  # ✅ Debugging step.
 
       - name: Debug WordPress Path
         run: |
