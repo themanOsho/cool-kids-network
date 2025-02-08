@@ -9,6 +9,28 @@ on:
       - main
 
 jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPCS (Strict Mode ❌)
+        run: vendor/bin/phpcs --standard=WordPress --ignore=vendor .
+
+      - name: Auto-fix PHPCS issues ✅
+        run: vendor/bin/phpcbf --standard=WordPress --ignore=vendor . || true
+
+  jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
