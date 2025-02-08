@@ -81,4 +81,7 @@ jobs:
 
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit --testdox
+        run: |
+          chmod +x vendor/bin/phpunit  # ✅ Fix: Grant execute permission
+          vendor/bin/phpunit --testdox
+
