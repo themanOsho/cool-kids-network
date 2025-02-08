@@ -82,6 +82,13 @@ jobs:
       - name: Verify WordPress is Installed
         run: wp core is-installed --allow-root || exit 1  # ✅ Debugging step
 
+      - name: Debug WordPress Path
+        run: |
+          echo "Current Working Directory:"
+          pwd
+          echo "List all files & folders:"
+          ls -R
+
       - name: Run PHPUnit
         run: |
           chmod +x vendor/bin/phpunit  # ✅ Fix: Grant execute permission
