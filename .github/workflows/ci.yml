@@ -20,20 +20,42 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
-          tools: php-cs-fixer, phpcs, phpcbf # ✅ Ensure PHPCS is installed
+          tools: php-cs-fixer, phpcs, phpcbf
+
+      - name: Install WordPress Coding Standards (WPCS)
+        run: |
+          composer global require "wp-coding-standards/wpcs"
+          phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+          phpcs -i
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Run PHPCS (Strict Mode ❌)
-        run: phpcs --standard=WordPress --ignore=vendor . # ✅ Run PHPCS globally
+      - name: Run PHPCS (Strict Mode)
+        run: phpcs --standard=WordPress --ignore=vendor .
 
-      - name: Auto-fix PHPCS issues ✅
-        run: phpcbf --standard=WordPress --ignore=vendor . || true # ✅ Auto-fix linting issues
+      - name: Auto-fix PHPCS issues
+        run: phpcbf --standard=WordPress --ignore=vendor . || true
 
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -46,12 +68,15 @@ jobs:
       - name: Install Dependencies
         run: composer install
 
-      - name: Install WP-CLI  # ✅ Install WP-CLI before running commands
+      - name: Install WP-CLI
         run: |
           curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
-          
+
+      - name: Wait for MySQL to be ready
+        run: sleep 15
+
       - name: Start WordPress
         run: |
           wp core download --allow-root
