@@ -1,16 +1,11 @@
 {
-    "require-dev": {
-      "phpunit/phpunit": "^9.5",
-      "doctrine/instantiator": "^1.5"
-    },
-    "autoload": {
-      "psr-4": {
-        "CoolKidsNetwork\\": "./"
-      }
-    },
-    "autoload-dev": {
-      "psr-4": {
-        "CoolKidsNetwork\\Tests\\": "tests/"
-      }
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "doctrine/instantiator": "^1.5"
+  },
+  "autoload": {
+        "psr-4": {
+            "CoolKidsNetwork\\": "includes/"
+        }
     }
-  }
+}

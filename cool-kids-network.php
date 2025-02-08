@@ -14,12 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Load required class files.
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-charactermanager.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-coolkidsnetwork.php';
+// Load Composer Autoloader
+require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
 // Use the namespace.
-use CoolKidsNetwork\CoolKidsNetwork;
+use CoolKidsNetwork\coolkidsnetwork;
 
 // Initialize the plugin.
 new CoolKidsNetwork();
