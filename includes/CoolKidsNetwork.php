@@ -9,6 +9,8 @@
 
 namespace CoolKidsNetwork;
 
+use WP_REST_Request;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; /** Prevent direct access. */
 }
@@ -79,54 +81,55 @@ class CoolKidsNetwork {
 	 * @return WP_REST_Response|WP_Error API response or error message.
 	 */
 	public function update_user_role( WP_REST_Request $request ) {
+		// Ensure WordPress is fully loaded.
+		if ( ! defined( 'ABSPATH' ) ) {
+			require_once dirname( __DIR__, 3 ) . '/wp-load.php';
+		}
+
+		// Get request parameters safely.
 		$email      = sanitize_email( $request->get_param( 'email' ) );
 		$first_name = sanitize_text_field( $request->get_param( 'first_name' ) );
 		$last_name  = sanitize_text_field( $request->get_param( 'last_name' ) );
 		$new_role   = sanitize_text_field( $request->get_param( 'role' ) );
 
-		if ( ! in_array( $new_role, array( 'cool_kid', 'cooler_kid', 'coolest_kid' ), true ) ) {
+		// Ensure required parameters exist.
+		if ( empty( $email ) || empty( $new_role ) ) {
+			return new WP_Error( 'missing_params', 'Email and role are required.', array( 'status' => 400 ) );
+		}
+
+		// Validate role.
+		$valid_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
+		if ( ! in_array( $new_role, $valid_roles, true ) ) {
 			return new WP_Error( 'invalid_role', 'Invalid role specified.', array( 'status' => 400 ) );
 		}
 
-		// First, try to get the user by email (faster than meta query).
+		// Try to get user by email.
 		$user = get_user_by( 'email', $email );
 
-		// If no user found by email, search by first and last name.
+		// If user not found, try searching by first & last name.
 		if ( ! $user && $first_name && $last_name ) {
-			$cache_key = 'user_' . md5( strtolower( $first_name . '_' . $last_name ) );
-			$user_id   = wp_cache_get( $cache_key );
-
-			if ( false === $user_id ) {
-				$query = new WP_User_Query(
-					array(
-						'meta_query' => array(
-							'relation' => 'AND',
-							array(
-								'key'     => 'first_name',
-								'value'   => $first_name,
-								'compare' => '=',
-							),
-							array(
-								'key'     => 'last_name',
-								'value'   => $last_name,
-								'compare' => '=',
-							),
+			$user_query = new WP_User_Query(
+				array(
+					'meta_query' => array(
+						'relation' => 'AND',
+						array(
+							'key'     => 'first_name',
+							'value'   => $first_name,
+							'compare' => '=',
 						),
-						'fields'     => 'ID', // Only fetch the ID to reduce memory usage
-						'number'     => 1, // Limit to 1 result
-					)
-				);
+						array(
+							'key'     => 'last_name',
+							'value'   => $last_name,
+							'compare' => '=',
+						),
+					),
+					'number'     => 1,
+				)
+			);
 
-				$users = $query->get_results();
-
-				if ( ! empty( $users ) ) {
-					$user_id = $users[0];
-					wp_cache_set( $cache_key, $user_id, 'users', 3600 ); // Cache result for 1 hour
-				}
-			}
-
-			if ( $user_id ) {
-				$user = get_user_by( 'ID', $user_id );
+			$users = $user_query->get_results();
+			if ( ! empty( $users ) ) {
+				$user = $users[0];
 			}
 		}
 
@@ -134,6 +137,7 @@ class CoolKidsNetwork {
 			return new WP_Error( 'user_not_found', 'No user found.', array( 'status' => 404 ) );
 		}
 
+		// Update the user role.
 		wp_update_user(
 			array(
 				'ID'   => $user->ID,
@@ -167,7 +171,7 @@ class CoolKidsNetwork {
 			check_admin_referer( 'cool_kids_form' ); /** Verify nonce */
 			$this->assign_role();
 		}
-	
+
 		$plugin_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
 		$users        = get_users( array( 'role__in' => $plugin_roles ) );
 		?>
@@ -216,23 +220,23 @@ class CoolKidsNetwork {
 		if ( isset( $_POST['user_id'], $_POST['new_role'], $_POST['cool_kids_nonce'] ) ) {
 			// Unsanitize before verification.
 			$nonce = sanitize_text_field( wp_unslash( $_POST['cool_kids_nonce'] ) );
-	
+
 			// Fix: Ensure the nonce matches what was set in the form.
 			if ( ! wp_verify_nonce( $nonce, 'cool_kids_form' ) ) {
 				echo "<div class='error notice'><p>Security check failed! Nonce verification failed.</p></div>";
 				return;
 			}
-	
+
 			$user_id  = intval( $_POST['user_id'] );
 			$new_role = sanitize_text_field( wp_unslash( $_POST['new_role'] ) );
-	
+
 			$valid_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
-	
+
 			if ( ! $user_id || ! in_array( $new_role, $valid_roles, true ) ) {
 				echo "<div class='error notice'><p>Invalid user or role.</p></div>";
 				return;
 			}
-	
+
 			$user = get_user_by( 'ID', $user_id );
 			if ( $user ) {
 				wp_update_user(
@@ -241,10 +245,10 @@ class CoolKidsNetwork {
 						'role' => $new_role,
 					)
 				);
-	
-				// Force WordPress to refresh role cache
+
+				// Force WordPress to refresh role cache.
 				clean_user_cache( $user_id );
-	
+
 				echo "<div class='updated notice'><p>Role updated successfully for " . esc_html( $user->display_name ) . '.</p></div>';
 			} else {
 				echo "<div class='error notice'><p>User not found.</p></div>";
