@@ -30,7 +30,6 @@ jobs:
       - name: Auto-fix PHPCS issues ✅
         run: vendor/bin/phpcbf --standard=WordPress --ignore=vendor . || true
 
-  jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
