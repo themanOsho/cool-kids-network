@@ -74,8 +74,11 @@ jobs:
         run: |
           wp core download --allow-root
           wp config create --dbname=wordpress_test --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --allow-root
+          # ✅ Drop the database if it already exists to avoid conflicts
+          wp db query "DROP DATABASE IF EXISTS wordpress_test;" --allow-root
           wp db create --allow-root
           wp core install --url=localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=test@example.com --allow-root
+
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit --testdox
