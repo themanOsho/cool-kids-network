@@ -27,18 +27,24 @@ jobs:
             
       - name: Install WordPress Coding Standards (WPCS)
         run: |
-          composer global require "wp-coding-standards/wpcs"
-          phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+          composer global require "wp-coding-standards/wpcs" --no-interaction --prefer-dist
+          composer global require "phpcsstandards/phpcsutils" "phpcsstandards/phpcsextra" --no-interaction --prefer-dist
+          phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs,$HOME/.composer/vendor/phpcsstandards/phpcsutils,$HOME/.composer/vendor/phpcsstandards/phpcsextra
           phpcs -i
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Run PHPCS (Strict Mode)
-        run: phpcs --standard=WordPress --ignore=vendor .
+        run: |
+          export PATH="$HOME/.composer/vendor/bin:$PATH"
+          phpcs --standard=WordPress --ignore=vendor .
 
       - name: Auto-fix PHPCS issues
-        run: phpcbf --standard=WordPress --ignore=vendor . || true
+        run: |
+          export PATH="$HOME/.composer/vendor/bin:$PATH"
+          phpcbf --standard=WordPress --ignore=vendor . || true
+
 
   test:
     name: Run Tests
