@@ -31,7 +31,17 @@ class CoolKidsNetwork {
 		add_shortcode( 'cool_kids_login', array( $this, 'login_form' ) );
 		add_shortcode( 'cool_kids_character', array( $this, 'character_data' ) );
 		add_shortcode( 'cool_kids_all_characters', array( $this, 'all_characters_data' ) );
+
+		// ✅ Enqueue styles for frontend UI.
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
 	}
+
+	/**
+     * Enqueue styles for frontend UI
+     */
+    public function enqueue_styles() {
+        wp_enqueue_style('cool-kids-styles', plugin_dir_url(dirname(__FILE__)) . 'assets/css/styles.css');
+    }
 
 	/**
 	 * Register custom user roles.
