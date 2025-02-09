@@ -179,7 +179,7 @@ class CoolKidsNetwork {
 			<h1>Assign Roles to Cool Kids</h1>
 			<form method="POST">
 				<?php wp_nonce_field( 'cool_kids_form' ); ?>
-				<input type="hidden" name="cool_kids_nonce" value="<?php echo wp_create_nonce( 'cool_kids_form' ); ?>">
+				<input type="hidden" name="cool_kids_nonce" value="<?php echo esc_attr( wp_create_nonce( 'cool_kids_form' ) ); ?>">
 				<table class="form-table">
 					<tr>
 						<th scope="row"><label for="user_id">Select User</label></th>
