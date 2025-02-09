@@ -22,29 +22,27 @@ jobs:
           php-version: '8.1'
           tools: php-cs-fixer, phpcs, phpcbf
 
-      - name: Allow Composer Plugins ✅  # Fix: Prevent Composer blocking
+      - name: Allow Composer Plugins ✅  # Prevent Composer blocking issues
         run: composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-            
-      - name: Install WordPress Coding Standards (WPCS)
+
+      - name: Install WordPress Coding Standards (WPCS) ✅ # Install PHPCS and dependencies
         run: |
-          composer global require "wp-coding-standards/wpcs" --no-interaction --prefer-dist
-          composer global require "phpcsstandards/phpcsutils" "phpcsstandards/phpcsextra" --no-interaction --prefer-dist
-          phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs,$HOME/.composer/vendor/phpcsstandards/phpcsutils,$HOME/.composer/vendor/phpcsstandards/phpcsextra
-          phpcs -i
+          composer global require squizlabs/php_codesniffer wp-coding-standards/wpcs phpcsstandards/phpcsutils phpcsstandards/phpcsextra --no-interaction --prefer-dist
+          phpcs --config-set installed_paths "$HOME/.composer/vendor/wp-coding-standards/wpcs,$HOME/.composer/vendor/phpcsstandards/phpcsutils,$HOME/.composer/vendor/phpcsstandards/phpcsextra"
+          phpcs -i  # Verify installation
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Run PHPCS (Strict Mode)
+      - name: Run PHPCS (Strict Mode) ✅
         run: |
           export PATH="$HOME/.composer/vendor/bin:$PATH"
           phpcs --standard=WordPress --ignore=vendor .
 
-      - name: Auto-fix PHPCS issues
+      - name: Auto-fix PHPCS issues ✅
         run: |
           export PATH="$HOME/.composer/vendor/bin:$PATH"
           phpcbf --standard=WordPress --ignore=vendor . || true
-
 
   test:
     name: Run Tests

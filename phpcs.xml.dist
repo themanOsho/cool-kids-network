@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset name="Custom WPCS">
+    <rule ref="WordPress"/>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <rule ref="WordPress.Files.FileName">
+        <severity>0</severity>
+    </rule>
+    <rule ref="WordPress.Classes.ClassFileName">
+        <severity>0</severity>
+    </rule>
+</ruleset>
