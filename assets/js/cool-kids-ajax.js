@@ -13,16 +13,15 @@ jQuery(document).ready(function($) {
                 nonce: nonce
             },
             success: function(response) {
-                $('#login-message').html('<p style="color: green;">' + response.message + '</p>');
                 if (response.success) {
+                    $('#login-message').html('<p style="color: green;">' + response.data.message + '</p>');
                     setTimeout(function() {
                         window.location.href = cool_kids_ajax.redirect_url;
                     }, 1000);
+                } else {
+                    $('#login-message').html('<p style="color: red;">Login failed. Please try again.</p>');
                 }
-            },
-            error: function(xhr) {
-                $('#login-message').html('<p style="color: red;">' + xhr.responseJSON.message + '</p>');
-            }
+            }            
         });
     });
 });
