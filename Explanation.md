@@ -40,10 +40,10 @@ The plugin registers three custom user roles:
 - **AJAX login prevents Elementor and other themes from breaking authentication.**
 
 ### **6️⃣ Security Measures**
-✅ **Nonce verification** prevents CSRF attacks.
-✅ **Sanitization of user input** prevents SQL injection.
-✅ **Escaping output** prevents XSS vulnerabilities.
-✅ **Restricted access** to API endpoints using WordPress permissions.
+- **Nonce verification** prevents CSRF attacks.
+- **Sanitization of user input** prevents SQL injection.
+- **Escaping output** prevents XSS vulnerabilities.
+- **Restricted access** to API endpoints using WordPress permissions.
 
 ---
 
@@ -61,7 +61,7 @@ The plugin registers three custom user roles:
 
 ## 🎯 **How This Plugin Achieves the Admin’s Goals**
 
-| **Admin Requirement** | **How We Implemented It** |
+| **Admin Requirement** | **How I Implemented It** |
 |------------------------|--------------------------|
 | **Assign roles easily** | Admin panel UI allows selecting users and updating their roles. |
 | **Secure role updates** | REST API enforces permission checks. |
