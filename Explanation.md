@@ -130,20 +130,9 @@ Role: Cool Kid
 
 ---
 
-## 5. `[cool_kids_assign_role]` - Admin Role Assignment
-**Description:** Displays the admin interface for assigning user roles (Only accessible to admins).
-
-**Usage:**
-```html
-[cool_kids_assign_role]
-```
-
----
-
 ## Notes:
 - All shortcodes can be added to **pages, posts, or widgets**.
 - The plugin ensures **proper security and role restrictions** for each shortcode.
-- Ensure users are **logged in** where required before accessing certain shortcodes.
 
 ---
 ## 🛠️ **Future Improvements**
