@@ -1,14 +1,14 @@
 # Cool Kids Network Plugin - Documentation
 
 ## 📌 Problem Statement
-The **Cool Kids Network** plugin is designed to **manage user roles and authentication** in a WordPress environment. The goal is to allow users to **register, log in, and have their roles updated** based on an administrator’s actions.
+The **Cool Kids Network** plugin is designed to **manage user roles and authentication** in a WordPress environment. The goal is to allow users to **generate a character by registration and log in.** **Their roles can be updated** based on an administrator’s actions.
 
 ### **Challenges Addressed:**
 1. **Managing user roles efficiently** within WordPress.
 2. **Providing an admin panel** to assign roles easily.
 3. **Creating a user-friendly login and registration system**.
 4. **Ensuring security** through nonce verification and sanitization.
-5. **Making sure the plugin works across all themes and page builders (e.g., Elementor).**
+5. **Making sure the plugin works across all themes and page builders.**
 
 ---
 
@@ -22,7 +22,7 @@ The plugin registers three custom user roles:
 
 ### **2️⃣ Registration & Login**
 - Registration uses the **RandomUser API** to generate fake user data.
-- Login is handled via **AJAX** to prevent conflicts with themes like Elementor.
+- Login is handled via **AJAX** to prevent conflicts with themes.
 - **Nonces** are used to secure login and registration.
 
 ### **3️⃣ Admin Role Management UI**
@@ -37,7 +37,7 @@ The plugin registers three custom user roles:
 ### **5️⃣ Front-End Design Improvements**
 - The plugin includes **custom CSS styles** to prevent theme conflicts.
 - Forms are **styled properly** and remain responsive.
-- **AJAX login prevents Elementor and other themes from breaking authentication.**
+- **AJAX login prevents plugins and other themes from breaking authentication.**
 
 ### **6️⃣ Security Measures**
 - **Nonce verification** prevents CSRF attacks.
@@ -61,7 +61,7 @@ The plugin registers three custom user roles:
 
 ## 🎯 **How This Plugin Achieves the Admin’s Goals**
 
-| **Admin Requirement** | **How I Implemented It** |
+| **Admin Requirement** | **Implementation** |
 |------------------------|--------------------------|
 | **Assign roles easily** | Admin panel UI allows selecting users and updating their roles. |
 | **Secure role updates** | REST API enforces permission checks. |
@@ -70,6 +70,82 @@ The plugin registers three custom user roles:
 
 ---
 
+# Cool Kids Network - Shortcodes Guide
+
+This document provides a list of all available shortcodes in the **Cool Kids Network** plugin and how to use them.
+
+## 1. `[cool_kids_registration]` - User Registration Form
+**Description:** Displays the user registration form, allowing users to register with an email.
+
+**Usage:**
+```html
+[cool_kids_registration]
+```
+
+---
+
+## 2. `[cool_kids_login]` - User Login Form
+**Description:** Displays the login form for users to log in using their email.
+
+**Usage:**
+```html
+[cool_kids_login]
+```
+
+---
+
+## 3. `[cool_kids_character]` - User Character Information
+**Description:** Displays the logged-in user's character data, including name, country, email, and role.
+
+**Usage:**
+```html
+[cool_kids_character]
+```
+
+**Output Example:**
+```
+Name: John Doe
+Country: USA
+Email: john@example.com
+Role: Cool Kid
+```
+
+---
+
+## 4. `[cool_kids_all_characters]` - View All User Data
+**Description:** Displays a table of all users in the system. Users with `cool_kid` role **cannot** view this data. Users with `coolest_kid` role can see emails and roles.
+
+**Usage:**
+```html
+[cool_kids_all_characters]
+```
+
+**Output Example:**
+```
+| Name       | Country  | Email            | Role       |
+|------------|---------|------------------|-----------|
+| Jane Doe   | Canada  | jane@example.com | Cooler Kid |
+| John Smith | UK      | john@example.com | Coolest Kid |
+```
+
+---
+
+## 5. `[cool_kids_assign_role]` - Admin Role Assignment
+**Description:** Displays the admin interface for assigning user roles (Only accessible to admins).
+
+**Usage:**
+```html
+[cool_kids_assign_role]
+```
+
+---
+
+## Notes:
+- All shortcodes can be added to **pages, posts, or widgets**.
+- The plugin ensures **proper security and role restrictions** for each shortcode.
+- Ensure users are **logged in** where required before accessing certain shortcodes.
+
+---
 ## 🛠️ **Future Improvements**
 🔹 Improve the **admin UI** by integrating WordPress UI components.  
 🔹 Add **more tests** for better reliability.  

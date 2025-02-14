@@ -340,13 +340,13 @@ class CoolKidsNetwork {
 						update_user_meta( $user_id, 'first_name', $random_data['first_name'] );
 						update_user_meta( $user_id, 'last_name', $random_data['last_name'] );
 						update_user_meta( $user_id, 'country', $random_data['country'] );
-						echo '<p>' . esc_html__( 'Registration successful! Welcome, Cool Kid!', 'cool-kids' ) . '</p>';
+						echo '<p class="ckn-msg">' . esc_html__( 'Registration successful! Welcome, Cool Kid!', 'cool-kids' ) . '</p>';
 					} else {
-						echo '<p>' . esc_html__( 'Error creating user:', 'cool-kids' ) . esc_html( $user_id->get_error_message() ) . '</p>';
+						echo '<p class="ckn-msg">' . esc_html__( 'Error creating user:', 'cool-kids' ) . esc_html( $user_id->get_error_message() ) . '</p>';
 					}
 				}
 			} else {
-				echo '<p>' . esc_html__( 'Email is already registered!', 'cool-kids' ) . '</p>';
+				echo '<p class="ckn-msg">' . esc_html__( 'Email is already registered!', 'cool-kids' ) . '</p>';
 			}
 		}
 		return ob_get_clean();
