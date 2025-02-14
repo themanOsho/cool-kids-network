@@ -1,8 +1,14 @@
 #cool-kids-login, #cool-kids-signup {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+	width: 100%;
+}
+
+#cool-kids-login input#email,
+#cool-kids-signup input#email {
+	text-transform: normal;
+	font-style: normal;
+	text-decoration: none;
+	line-height: 1.6em ;
+	letter-spacing: 0;
+	word-spacing: 0;
+	background: transparent;
 }

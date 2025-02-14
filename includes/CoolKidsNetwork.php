@@ -24,37 +24,41 @@ class CoolKidsNetwork {
 	 */
 	public function __construct() {
 		// Hooks and actions.
-		add_action('init', [$this, 'register_roles']);
-		add_action('rest_api_init', [$this, 'register_api_routes']);
-		add_action('admin_menu', [$this, 'add_admin_page']); // Admin page.
-		
+		add_action( 'init', array( $this, 'register_roles' ) );
+		add_action( 'rest_api_init', array( $this, 'register_api_routes' ) );
+		add_action( 'admin_menu', array( $this, 'add_admin_page' ) ); // Admin page.
+
 		// Register AJAX handler.
-		add_action('wp_ajax_nopriv_cool_kids_login', [$this, 'handle_ajax_login']);
-		add_action('wp_ajax_cool_kids_login', [$this, 'handle_ajax_login']); // Fix for logged-in users.
-	
+		add_action( 'wp_ajax_nopriv_cool_kids_login', array( $this, 'handle_ajax_login' ) );
+		add_action( 'wp_ajax_cool_kids_login', array( $this, 'handle_ajax_login' ) ); // Fix for logged-in users.
+
 		// Shortcodes.
-		add_shortcode('cool_kids_registration', [$this, 'registration_form']);
-		add_shortcode('cool_kids_login', [$this, 'login_form']);
-		add_shortcode('cool_kids_character', [$this, 'character_data']);
-		add_shortcode('cool_kids_all_characters', [$this, 'all_characters_data']);
-	
+		add_shortcode( 'cool_kids_registration', array( $this, 'registration_form' ) );
+		add_shortcode( 'cool_kids_login', array( $this, 'login_form' ) );
+		add_shortcode( 'cool_kids_character', array( $this, 'character_data' ) );
+		add_shortcode( 'cool_kids_all_characters', array( $this, 'all_characters_data' ) );
+
 		// Enqueue scripts & styles.
-		add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
 	/**
-     * Enqueue styles for frontend
-     */
+	 * Enqueue styles for frontend
+	 */
 	public function enqueue_assets() {
-		wp_enqueue_script('jquery'); // Ensure jQuery loads
-		wp_enqueue_script('cool-kids-ajax', plugin_dir_url(dirname(__FILE__)) . 'assets/js/cool-kids-ajax.js', ['jquery'], null, true);
-	
-		wp_localize_script('cool-kids-ajax', 'cool_kids_ajax', [
-			'ajax_url' => admin_url('admin-ajax.php'),
-			'redirect_url' => home_url('/profile')
-		]);
-	
-		wp_enqueue_style('cool-kids-styles', plugin_dir_url(dirname(__FILE__)) . 'assets/css/styles.css');
+		wp_enqueue_script( 'jquery' ); // Ensure jQuery loads
+		wp_enqueue_script( 'cool-kids-ajax', plugin_dir_url( __DIR__ ) . 'assets/js/cool-kids-ajax.js', array( 'jquery' ), null, true );
+
+		wp_localize_script(
+			'cool-kids-ajax',
+			'cool_kids_ajax',
+			array(
+				'ajax_url'     => admin_url( 'admin-ajax.php' ),
+				'redirect_url' => home_url( '/profile' ),
+			)
+		);
+
+		wp_enqueue_style( 'cool-kids-styles', plugin_dir_url( __DIR__ ) . 'assets/css/styles.css' );
 	}
 
 	/**
@@ -339,7 +343,7 @@ class CoolKidsNetwork {
 		ob_start();
 		?>
 		<form id="cool-kids-login" method="post">
-			<?php wp_nonce_field('cool_kids_login', 'cool_kids_nonce'); ?>
+			<?php wp_nonce_field( 'cool_kids_login', 'cool_kids_nonce' ); ?>
 			<label for="email">Email Address:</label>
 			<input type="email" id="email" name="email" required>
 			<button type="submit">Login</button>
@@ -353,19 +357,19 @@ class CoolKidsNetwork {
 	 * Handle AJAX login securely
 	 */
 	public function handle_ajax_login() {
-		if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cool_kids_login')) {
-			wp_send_json_error(['message' => esc_html__('Security check failed!', 'cool-kids')], 403);
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'cool_kids_login' ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Security check failed!', 'cool-kids' ) ), 403 );
 		}
 
-		$email = sanitize_email(wp_unslash($_POST['email']));
-		$user  = get_user_by('email', $email);
+		$email = sanitize_email( wp_unslash( $_POST['email'] ) );
+		$user  = get_user_by( 'email', $email );
 
-		if ($user) {
-			wp_set_current_user($user->ID);
-			wp_set_auth_cookie($user->ID);
-			wp_send_json_success(['message' => esc_html__('Login successful! Redirecting...', 'cool-kids')]);
+		if ( $user ) {
+			wp_set_current_user( $user->ID );
+			wp_set_auth_cookie( $user->ID );
+			wp_send_json_success( array( 'message' => esc_html__( 'Login successful! Redirecting...', 'cool-kids' ) ) );
 		} else {
-			wp_send_json_error(['message' => esc_html__('No account found with that email!', 'cool-kids')], 404);
+			wp_send_json_error( array( 'message' => esc_html__( 'No account found with that email!', 'cool-kids' ) ), 404 );
 		}
 	}
 
