@@ -46,8 +46,19 @@ class CoolKidsNetwork {
 	 * Enqueue styles for frontend
 	 */
 	public function enqueue_assets() {
-		wp_enqueue_script( 'jquery' ); // Ensure jQuery loads
-		wp_enqueue_script( 'cool-kids-ajax', plugin_dir_url( __DIR__ ) . 'assets/js/cool-kids-ajax.js', array( 'jquery' ), null, true );
+		wp_enqueue_script( 'jquery' ); // Ensure jQuery loads.
+
+		// Get file modification time to use as version.
+		$js_version  = filemtime( plugin_dir_path( __DIR__ ) . 'assets/js/cool-kids-ajax.js' );
+		$css_version = filemtime( plugin_dir_path( __DIR__ ) . 'assets/css/styles.css' );
+
+		wp_enqueue_script(
+			'cool-kids-ajax',
+			plugin_dir_url( __DIR__ ) . 'assets/js/cool-kids-ajax.js',
+			array( 'jquery' ),
+			$js_version, // Use file modification time as version.
+			true
+		);
 
 		wp_localize_script(
 			'cool-kids-ajax',
@@ -58,7 +69,12 @@ class CoolKidsNetwork {
 			)
 		);
 
-		wp_enqueue_style( 'cool-kids-styles', plugin_dir_url( __DIR__ ) . 'assets/css/styles.css' );
+		wp_enqueue_style(
+			'cool-kids-styles',
+			plugin_dir_url( __DIR__ ) . 'assets/css/styles.css',
+			array(),
+			$css_version // Use file modification time as version.
+		);
 	}
 
 	/**
@@ -357,10 +373,23 @@ class CoolKidsNetwork {
 	 * Handle AJAX login securely
 	 */
 	public function handle_ajax_login() {
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'cool_kids_login' ) ) {
+		// Ensure nonce exists before using it.
+		if ( ! isset( $_POST['nonce'] ) ) {
 			wp_send_json_error( array( 'message' => esc_html__( 'Security check failed!', 'cool-kids' ) ), 403 );
 		}
 
+		// Sanitize and verify nonce.
+		$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ) );
+		if ( ! wp_verify_nonce( $nonce, 'cool_kids_login' ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Security check failed!', 'cool-kids' ) ), 403 );
+		}
+
+		// Ensure email is set before using it.
+		if ( ! isset( $_POST['email'] ) ) {
+			wp_send_json_error( array( 'message' => esc_html__( 'Email is required!', 'cool-kids' ) ), 400 );
+		}
+
+		// Sanitize and process email.
 		$email = sanitize_email( wp_unslash( $_POST['email'] ) );
 		$user  = get_user_by( 'email', $email );
 
