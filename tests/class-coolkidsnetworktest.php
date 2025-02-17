@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Ensure plugin classes are loaded.
-require_once ABSPATH . 'wp-content/plugins/cool-kids-network/includes/class-coolkidsnetwork.php';
+require_once ABSPATH . 'includes/class-coolkidsnetwork.php';
 
 /**
  * Class CoolKidsNetworkTest
