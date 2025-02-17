@@ -20,12 +20,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	if ( file_exists( $wp_load_path ) ) {
 		require_once $wp_load_path;
 	} else {
-		die( "ERROR: Cannot load WordPress! wp-load.php not found." );
+		die( 'ERROR: Cannot load WordPress! wp-load.php not found.' );
 	}
 }
 
-// Ensure plugin classes are loaded.
-require_once ABSPATH . 'includes/class-coolkidsnetwork.php';
+// ✅ Dynamically find and load the plugin class.
+$plugin_class_path = dirname( __DIR__ ) . '/includes/class-coolkidsnetwork.php';
+
+if ( file_exists( $plugin_class_path ) ) {
+    require_once $plugin_class_path;
+} else {
+    die( 'ERROR: Cannot load plugin class! class-coolkidsnetwork.php not found.' );
+}
 
 /**
  * Class CoolKidsNetworkTest
