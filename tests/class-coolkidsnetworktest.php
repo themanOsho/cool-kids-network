@@ -9,21 +9,22 @@ namespace CoolKidsNetwork\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-// ✅ Dynamically find wp-load.php for local & CI/CD environments.
-$wp_load_path = '/home/runner/work/cool-kids-network/cool-kids-network/wp-load.php';
+// Define ABSPATH if not already defined.
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' ); // Adjust as needed.
+}
 
-// Check if wp-load.php exists.
+// Dynamically find and load wp-load.php.
+$wp_load_path = ABSPATH . 'wp-load.php';
+
 if ( file_exists( $wp_load_path ) ) {
 	require_once $wp_load_path;
 } else {
-	global $wp_filesystem;
-	if ( empty( $wp_filesystem ) ) {
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		WP_Filesystem();
-	}
-	$wp_filesystem->put_contents( ABSPATH . 'wp-content/debug.log', "ERROR: wp-load.php not found at: $wp_load_path\n", FS_CHMOD_FILE );
-	exit( 1 );
+	exit( 'ERROR: wp-load.php not found at: ' . esc_html( $wp_load_path ) );
 }
+
+// Ensure plugin classes are loaded.
+require_once ABSPATH . 'wp-content/plugins/cool-kids-network/includes/class-coolkidsnetwork.php';
 
 /**
  * Class CoolKidsNetworkTest

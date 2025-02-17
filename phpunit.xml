@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php">
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true">
     <testsuites>
-        <testsuite name="Cool Kids Network Tests">
-            <directory suffix="Test.php">tests</directory>
+        <testsuite name="CoolKidsNetwork Test Suite">
+            <directory suffix=".php">tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

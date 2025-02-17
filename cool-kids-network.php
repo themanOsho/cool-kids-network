@@ -17,5 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Load Composer Autoloader.
 require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
+// Include required plugin files.
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-coolkidsnetwork.php';
+
 // Use the namespace.
 new CoolKidsNetwork\CoolKidsNetwork();

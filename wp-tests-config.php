@@ -24,7 +24,9 @@ define( 'WP_DEBUG_LOG', true );
 define( 'WP_DEBUG_DISPLAY', false );
 
 // Set the correct WordPress installation path.
-define( 'ABSPATH', 'C:/xampp/htdocs/wp6.7.1/rankmath-CKN-test/' ); // Adjust this path.
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', dirname( __DIR__, 1 ) . '/' ); // Adjust if needed.
+}
 
 // Include WordPress settings.
 require_once ABSPATH . 'wp-settings.php';

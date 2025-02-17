@@ -34,6 +34,9 @@ class CoolKidsNetwork {
 		add_action( 'admin_init', array( $this, 'restrict_admin_access' ) ); // restrict admin access.
 		add_action( 'after_setup_theme', array( $this, 'hide_admin_bar' ) ); // hide admin bar.
 
+		// Register the function to be called during plugin activation.
+		register_activation_hook( __FILE__, array( 'CoolKidsNetwork', 'create_user_meta_indexes' ) );
+
 		// Shortcodes.
 		add_shortcode( 'cool_kids_registration', array( $this, 'registration_form' ) );
 		add_shortcode( 'cool_kids_login', array( $this, 'login_form' ) );
@@ -127,7 +130,6 @@ class CoolKidsNetwork {
 	 * @return WP_REST_Response|WP_Error API response or error message.
 	 */
 	public function update_user_role( WP_REST_Request $request ) {
-		// Ensure WordPress is fully loaded.
 		if ( ! defined( 'ABSPATH' ) ) {
 			require_once dirname( __DIR__, 3 ) . '/wp-load.php';
 		}
@@ -138,7 +140,6 @@ class CoolKidsNetwork {
 		$last_name  = sanitize_text_field( $request->get_param( 'last_name' ) );
 		$new_role   = sanitize_text_field( $request->get_param( 'role' ) );
 
-		// Ensure required parameters exist.
 		if ( empty( $email ) || empty( $new_role ) ) {
 			return new WP_Error( 'missing_params', 'Email and role are required.', array( 'status' => 400 ) );
 		}
@@ -149,33 +150,52 @@ class CoolKidsNetwork {
 			return new WP_Error( 'invalid_role', 'Invalid role specified.', array( 'status' => 400 ) );
 		}
 
-		// Try to get user by email.
-		$user = get_user_by( 'email', $email );
+		// Attempt to fetch user from cache before querying DB.
+		$user = wp_cache_get( 'user_email_' . $email, 'cool_kids' );
 
-		// If user not found, try searching by first & last name.
-		if ( ! $user && $first_name && $last_name ) {
-			$user_query = new WP_User_Query(
-				array(
-					'meta_query' => array(
-						'relation' => 'AND',
-						array(
-							'key'     => 'first_name',
-							'value'   => $first_name,
-							'compare' => '=',
-						),
-						array(
-							'key'     => 'last_name',
-							'value'   => $last_name,
-							'compare' => '=',
-						),
-					),
-					'number'     => 1,
-				)
-			);
+		if ( ! $user ) {
+			$user = get_user_by( 'email', $email );
 
-			$users = $user_query->get_results();
-			if ( ! empty( $users ) ) {
-				$user = $users[0];
+			// If user not found by email, try by first & last name.
+			if ( ! $user && $first_name && $last_name ) {
+				$cache_key  = 'user_name_' . md5( $first_name . $last_name );
+				$user_query = wp_cache_get( $cache_key, 'cool_kids' );
+
+				if ( false === $user_query ) {
+					global $wpdb;
+
+					// Ensure indexes exist on meta fields for performance.
+					self::create_user_meta_indexes();
+
+					// Use optimized `get_users()` query instead of direct SQL.
+					$users = get_users(
+						array(
+							'meta_query' => array(
+								array(
+									'key'     => 'first_name',
+									'value'   => $first_name,
+									'compare' => '=',
+								),
+								array(
+									'key'     => 'last_name',
+									'value'   => $last_name,
+									'compare' => '=',
+								),
+							),
+							'number'     => 1,
+							'fields'     => 'ID',
+						)
+					);
+
+					if ( ! empty( $users ) ) {
+						$user = get_userdata( $users[0] );
+						wp_cache_set( $cache_key, $user, 'cool_kids', 300 ); // Cache for 5 mins.
+					}
+				}
+			}
+
+			if ( $user ) {
+				wp_cache_set( 'user_email_' . $email, $user, 'cool_kids', 300 ); // Cache for 5 mins.
 			}
 		}
 
@@ -183,7 +203,7 @@ class CoolKidsNetwork {
 			return new WP_Error( 'user_not_found', 'No user found.', array( 'status' => 404 ) );
 		}
 
-		// Update the user role.
+		// Update user role.
 		wp_update_user(
 			array(
 				'ID'   => $user->ID,
@@ -192,6 +212,39 @@ class CoolKidsNetwork {
 		);
 
 		return rest_ensure_response( array( 'message' => 'User role updated successfully.' ) );
+	}
+
+	/**
+	 * Create indexes on user meta fields to improve query performance.
+	 */
+	public static function create_user_meta_indexes() {
+		global $wpdb;
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$indexes = array(
+			'first_name_idx' => "ALTER TABLE {$wpdb->usermeta} ADD INDEX first_name_idx (meta_key(191), meta_value(191))",
+			'last_name_idx'  => "ALTER TABLE {$wpdb->usermeta} ADD INDEX last_name_idx (meta_key(191), meta_value(191))",
+		);
+
+		foreach ( $indexes as $index_name => $query ) {
+			$cache_key    = "index_exists_{$index_name}";
+			$index_exists = wp_cache_get( $cache_key, 'cool_kids' );
+
+			if ( false === $index_exists ) {
+				// Use `SHOW INDEX` safely within WordPress environment.
+				$index_exists = $wpdb->prepare(
+					'SELECT COUNT(1) FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = %s AND INDEX_NAME = %s',
+					$wpdb->usermeta,
+					$index_name
+				);
+
+				wp_cache_set( $cache_key, $index_exists, 'cool_kids', 86400 ); // Cache for 24 hours.
+			}
+
+			if ( ! $index_exists ) {
+				dbDelta( $query );
+			}
+		}
 	}
 
 	/**
