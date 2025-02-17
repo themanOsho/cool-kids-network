@@ -19,7 +19,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
+          php-version: '8.1'
           tools: php-cs-fixer, phpcs, phpcbf
 
       - name: Allow Composer Plugins ✅
@@ -43,18 +43,18 @@ jobs:
         run: |
           export PATH="$HOME/.composer/vendor/bin:$PATH"
           phpcbf --standard=WordPress --ignore=vendor,includes/class-coolkidsnetwork.php . || true
-          
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7 # ✅ Use MySQL 5.7
+        image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root # ✅ Correctly set root password
-          MYSQL_DATABASE: wordpress_test # ✅ Database for WordPress tests
-          MYSQL_USER: wordpress # ✅ Create a non-root MySQL user
-          MYSQL_PASSWORD: wordpress # ✅ Set password for the user
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
         ports:
           - 3306:3306
@@ -66,7 +66,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.0"
+          php-version: '8.0'
 
       - name: Install Dependencies
         run: composer install
@@ -87,14 +87,14 @@ jobs:
           echo "WordPress Installed"
 
       - name: Verify WordPress is Installed
-        run: wp core is-installed --allow-root || exit 1 # ✅ Debugging step.
+        run: wp core is-installed --allow-root || exit 1
 
       - name: Debug WordPress Path
         run: |
           echo "Current Working Directory:"
           pwd
           echo "List all files & folders:"
-          ls -R
+          ls -lah
 
       - name: Run PHPUnit
         run: |

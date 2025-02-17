@@ -14,13 +14,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' ); // Adjust as needed.
 }
 
-// Dynamically find and load wp-load.php.
-$wp_load_path = ABSPATH . 'wp-load.php';
-
-if ( file_exists( $wp_load_path ) ) {
-	require_once $wp_load_path;
-} else {
-	exit( 'ERROR: wp-load.php not found at: ' . esc_html( $wp_load_path ) );
+// ✅ Dynamically find and load WordPress.
+if ( ! defined( 'ABSPATH' ) ) {
+	$wp_load_path = dirname( __DIR__, 2 ) . '/wp-load.php';
+	if ( file_exists( $wp_load_path ) ) {
+		require_once $wp_load_path;
+	} else {
+		die( "ERROR: Cannot load WordPress! wp-load.php not found." );
+	}
 }
 
 // Ensure plugin classes are loaded.
