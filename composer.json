@@ -6,15 +6,10 @@
     "wp-coding-standards/wpcs": "^3.1"
   },
   "autoload": {
-    "psr-4": {
-      "CoolKidsNetwork\\": "includes/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "CoolKidsNetwork\\Tests\\": "tests/"
-    }
-  },
+        "psr-4": {
+            "CoolKidsNetwork\\": "includes/"
+        }
+    },
   "config": {
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true

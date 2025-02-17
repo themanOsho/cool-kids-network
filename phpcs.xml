@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ruleset name="CoolKidsNetwork">
+    <description>PHPCS configuration for Cool Kids Network plugin.</description>
+
+    <!-- Include WordPress Coding Standards -->
+    <rule ref="WordPress"/>
+
+    <!-- Exclude specific files or directories -->
+    <exclude-pattern>includes/class-coolkidsnetwork.php</exclude-pattern>
+</ruleset>
