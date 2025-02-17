@@ -18,7 +18,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
 // Use the namespace.
-use CoolKidsNetwork\coolkidsnetwork;
-
-// Initialize the plugin.
-new CoolKidsNetwork();
+new CoolKidsNetwork\CoolKidsNetwork();
