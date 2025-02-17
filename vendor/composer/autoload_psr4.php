@@ -10,5 +10,6 @@ return array(
     'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => array($vendorDir . '/dealerdirect/phpcodesniffer-composer-installer/src'),
     'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
+    'CoolKidsNetwork\\Tests\\' => array($baseDir . '/tests'),
     'CoolKidsNetwork\\' => array($baseDir . '/includes'),
 );

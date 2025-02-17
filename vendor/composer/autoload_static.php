@@ -24,6 +24,7 @@ class ComposerStaticInit86682d188af2bd44950ebf218fac0849
         ),
         'C' => 
         array (
+            'CoolKidsNetwork\\Tests\\' => 22,
             'CoolKidsNetwork\\' => 16,
         ),
     );
@@ -45,6 +46,10 @@ class ComposerStaticInit86682d188af2bd44950ebf218fac0849
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
+        'CoolKidsNetwork\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
+        ),
         'CoolKidsNetwork\\' => 
         array (
             0 => __DIR__ . '/../..' . '/includes',
@@ -53,8 +58,6 @@ class ComposerStaticInit86682d188af2bd44950ebf218fac0849
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'CoolKidsNetwork\\CharacterManager' => __DIR__ . '/../..' . '/includes/CharacterManager.php',
-        'CoolKidsNetwork\\CoolKidsNetwork' => __DIR__ . '/../..' . '/includes/CoolKidsNetwork.php',
         'DeepCopy\\DeepCopy' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/DeepCopy.php',
         'DeepCopy\\Exception\\CloneException' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Exception/CloneException.php',
         'DeepCopy\\Exception\\PropertyException' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Exception/PropertyException.php',
