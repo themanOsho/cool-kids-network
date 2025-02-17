@@ -31,6 +31,8 @@ class CoolKidsNetwork {
 		// Register AJAX handler.
 		add_action( 'wp_ajax_nopriv_cool_kids_login', array( $this, 'handle_ajax_login' ) );
 		add_action( 'wp_ajax_cool_kids_login', array( $this, 'handle_ajax_login' ) ); // Fix for logged-in users.
+		add_action( 'admin_init', array( $this, 'restrict_admin_access' ) ); // restrict admin access.
+		add_action( 'after_setup_theme', array( $this, 'hide_admin_bar' ) ); // hide admin bar.
 
 		// Shortcodes.
 		add_shortcode( 'cool_kids_registration', array( $this, 'registration_form' ) );
@@ -401,6 +403,36 @@ class CoolKidsNetwork {
 			wp_send_json_error( array( 'message' => esc_html__( 'No account found with that email!', 'cool-kids' ) ), 404 );
 		}
 	}
+
+	/**
+	 * Prevent non-admin users from accessing wp-admin.
+	 */
+	public function restrict_admin_access() {
+		if ( is_user_logged_in() ) {
+			$user          = wp_get_current_user();
+			$blocked_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
+
+			if ( array_intersect( $blocked_roles, (array) $user->roles ) && ! defined( 'DOING_AJAX' ) ) {
+				wp_safe_redirect( home_url( '/profile' ) ); // Redirect to profile page.
+				exit;
+			}
+		}
+	}
+
+	/**
+	 * Hide admin bar for non-admin users.
+	 */
+	public function hide_admin_bar() {
+		if ( is_user_logged_in() ) {
+			$user          = wp_get_current_user();
+			$blocked_roles = array( 'cool_kid', 'cooler_kid', 'coolest_kid' );
+
+			if ( array_intersect( $blocked_roles, (array) $user->roles ) ) {
+				show_admin_bar( false ); // Hide admin bar.
+			}
+		}
+	}
+
 
 	/**
 	 * Display character data
