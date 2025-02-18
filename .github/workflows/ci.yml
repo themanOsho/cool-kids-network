@@ -100,7 +100,7 @@ jobs:
           ls -R /home/runner/work/cool-kids-network/cool-kids-network || true
 
           # Ensure ABSPATH is set correctly
-          export ABSPATH="/home/runner/work/cool-kids-network/cool-kids-network/wordpress/"
+          export ABSPATH="/home/runner/work/cool-kids-network/cool-kids-network/"
           echo "ABSPATH set to: $ABSPATH"
 
           # Verify wp-load.php exists
