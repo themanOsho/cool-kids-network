@@ -77,10 +77,11 @@ jobs:
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
 
-      - name: Install WordPress
+      - name: Install WordPress Fix installation path
         run: |
-          mkdir -p /home/runner/wordpress
-          cd /home/runner/wordpress
+          mkdir -p /home/runner/work/cool-kids-network/cool-kids-network/wordpress
+          cd /home/runner/work/cool-kids-network/cool-kids-network/wordpress
+          
           wp core download --allow-root
           wp config create --dbname=wordpress_test --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --allow-root
 
@@ -89,7 +90,20 @@ jobs:
           wp db create --allow-root
 
           wp core install --url=localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=test@example.com --allow-root
-          echo "WordPress Installed"
+          
+          echo "✅ WordPress Installed Successfully!"
+
+      - name: Verify WordPress Installation Debugging
+        run: |
+          echo "✅ Checking WordPress files in project directory..."
+          ls -R /home/runner/work/cool-kids-network/cool-kids-network/wordpress || true
+          
+          if [ ! -f "/home/runner/work/cool-kids-network/cool-kids-network/wordpress/wp-load.php" ]; then
+            echo "❌ Error: wp-load.php not found!"
+            exit 1
+          else
+            echo "✅ WordPress wp-load.php found!"
+          fi
 
       - name: Run Tests
         run: |
@@ -100,12 +114,12 @@ jobs:
           ls -R /home/runner/work/cool-kids-network/cool-kids-network || true
 
           # Ensure ABSPATH is set correctly
-          export ABSPATH="/home/runner/work/cool-kids-network/cool-kids-network/"
+          export ABSPATH="/home/runner/work/cool-kids-network/cool-kids-network/wordpress/"
           echo "ABSPATH set to: $ABSPATH"
 
           # Verify wp-load.php exists
           if [ ! -f "$ABSPATH/wp-load.php" ]; then
-            echo "Error: wp-load.php not found in $ABSPATH"
+            echo "❌ Error: wp-load.php not found in $ABSPATH"
             exit 1
           fi
 
