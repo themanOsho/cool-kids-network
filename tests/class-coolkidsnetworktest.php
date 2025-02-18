@@ -11,26 +11,25 @@ use PHPUnit\Framework\TestCase;
 
 // Define ABSPATH if not already defined.
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' ); // Adjust as needed.
+	define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' );
 }
 
 // ✅ Dynamically find and load WordPress.
-if ( ! defined( 'ABSPATH' ) ) {
-	$wp_load_path = dirname( __DIR__, 2 ) . '/wp-load.php';
-	if ( file_exists( $wp_load_path ) ) {
-		require_once $wp_load_path;
-	} else {
-		die( 'ERROR: Cannot load WordPress! wp-load.php not found.' );
-	}
+$wp_load_path = ABSPATH . 'wp-load.php';
+
+if ( file_exists( $wp_load_path ) ) {
+	require_once $wp_load_path;
+} else {
+	die( 'ERROR: Cannot load WordPress! wp-load.php not found.' );
 }
 
 // ✅ Dynamically find and load the plugin class.
 $plugin_class_path = dirname( __DIR__ ) . '/includes/class-coolkidsnetwork.php';
 
 if ( file_exists( $plugin_class_path ) ) {
-    require_once $plugin_class_path;
+	require_once $plugin_class_path;
 } else {
-    die( 'ERROR: Cannot load plugin class! class-coolkidsnetwork.php not found.' );
+	die( 'ERROR: Cannot load plugin class! class-coolkidsnetwork.php not found.' );
 }
 
 /**
