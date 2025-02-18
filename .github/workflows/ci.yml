@@ -84,14 +84,30 @@ jobs:
           wp core download --allow-root
           wp config create --dbname=wordpress_test --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --allow-root
 
-          # ✅ Fix: Drop database if it already exists before creating a new one.
+          # Fix: Drop database if it already exists before creating a new one.
           wp db query "DROP DATABASE IF EXISTS wordpress_test;" --allow-root || true
           wp db create --allow-root
 
           wp core install --url=localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=test@example.com --allow-root
           echo "WordPress Installed"
 
-      - name: Run PHPUnit
+      - name: Run Tests
         run: |
-          chmod +x vendor/bin/phpunit
+          chmod +x vendor/bin/phpunit  # Fix: Grant execute permission
+          
+          # Debugging Step: Show Current Directory Structure
+          echo "Listing files to verify WordPress installation:"
+          ls -R /home/runner/work/cool-kids-network/cool-kids-network || true
+
+          # Ensure ABSPATH is set correctly
+          export ABSPATH="/home/runner/work/cool-kids-network/cool-kids-network/wordpress/"
+          echo "ABSPATH set to: $ABSPATH"
+
+          # Verify wp-load.php exists
+          if [ ! -f "$ABSPATH/wp-load.php" ]; then
+            echo "Error: wp-load.php not found in $ABSPATH"
+            exit 1
+          fi
+
+          # Run Tests
           vendor/bin/phpunit --testdox
