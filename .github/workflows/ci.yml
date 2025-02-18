@@ -19,7 +19,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: "8.1"
           tools: php-cs-fixer, phpcs, phpcbf
 
       - name: Allow Composer Plugins
@@ -66,7 +66,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: "8.0"
 
       - name: Install Dependencies
         run: composer install
@@ -83,12 +83,13 @@ jobs:
           cd /home/runner/wordpress
           wp core download --allow-root
           wp config create --dbname=wordpress_test --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --allow-root
+
+          # ✅ Fix: Drop database if it already exists before creating a new one.
+          wp db query "DROP DATABASE IF EXISTS wordpress_test;" --allow-root || true
           wp db create --allow-root
+
           wp core install --url=localhost --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=test@example.com --allow-root
           echo "WordPress Installed"
-
-      - name: Set WordPress Path in ABSPATH
-        run: echo "ABSPATH='/home/runner/wordpress/'" >> $GITHUB_ENV
 
       - name: Run PHPUnit
         run: |
