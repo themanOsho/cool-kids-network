@@ -14,16 +14,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' );
 }
 
-// ✅ Dynamically find and load WordPress.
-$wp_load_path = ABSPATH . 'wp-load.php';
+// Dynamically find wp-load.php for local & CI/CD environments.
+$wp_load_paths = array(
+	'/home/runner/work/cool-kids-network/cool-kids-network/wp-load.php', // CI/CD environment.
+	ABSPATH . 'wp-load.php', // Local environment.
+);
 
-if ( file_exists( $wp_load_path ) ) {
-	require_once $wp_load_path;
-} else {
+$wp_loaded = false;
+foreach ( $wp_load_paths as $wp_load_path ) {
+	if ( file_exists( $wp_load_path ) ) {
+		require_once $wp_load_path;
+		$wp_loaded = true;
+		break;
+	}
+}
+
+if ( ! $wp_loaded ) {
 	die( 'ERROR: Cannot load WordPress! wp-load.php not found.' );
 }
 
-// ✅ Dynamically find and load the plugin class.
+// Dynamically find and load the plugin class.
 $plugin_class_path = dirname( __DIR__ ) . '/includes/class-coolkidsnetwork.php';
 
 if ( file_exists( $plugin_class_path ) ) {
