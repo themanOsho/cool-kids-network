@@ -9,18 +9,16 @@ namespace CoolKidsNetwork\Tests;
 
 use PHPUnit\Framework\TestCase;
 
+// Dynamically detect WordPress installation path.
+$wp_root = getenv( 'ABSPATH' ) ? getenv( 'ABSPATH' ) : dirname( __DIR__, 4 ) . '/';
+
 // Define ABSPATH if not already defined.
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', dirname( __DIR__, 4 ) . '/' );
+	define( 'ABSPATH', rtrim( $wp_root, '/' ) . '/' );
 }
 
-// Dynamically find wp-load.php for local & CI/CD environments.
-$wp_load_path = ABSPATH . 'wp-load.php'; // Local environment.
-
-if ( getenv( 'CI' ) ) {
-	// CI/CD environment.
-	$wp_load_path = '/home/runner/work/cool-kids-network/cool-kids-network/wp-load.php';
-}
+// Dynamically find wp-load.php.
+$wp_load_path = ABSPATH . 'wp-load.php';
 
 if ( file_exists( $wp_load_path ) ) {
 	require_once $wp_load_path;
@@ -47,6 +45,13 @@ class CoolKidsNetworkTest extends TestCase {
 	 */
 	public function test_user_role_assignment() {
 		$this->assertTrue( function_exists( 'wp_update_user' ), "WordPress function 'wp_update_user' is missing." );
+	}
+
+	/**
+	 * Test if the esc_html() function exists.
+	 */
+	public function test_esc_html_function() {
+		$this->assertTrue( function_exists( 'esc_html' ), "WordPress function 'esc_html' is missing." );
 	}
 
 	/**
